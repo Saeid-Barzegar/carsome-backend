@@ -16,9 +16,9 @@ const Inspections = require("./models/inspections")
 app.use(bodyParser.json())
 
 app.all('/*', function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*"); // restrict it to the required domain
+    res.header("Access-Control-Allow-Origin", "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+    res.header('Access-Control-Allow-Headers', 'Content-type');
     if (req.method == 'OPTIONS') {
       res.status(200).end();
     } else {
@@ -39,7 +39,7 @@ app.get('/', (request, response) => {
     }).catch(err => {
         response.json({
             message: err,
-            data: {}
+            data: []
         })
     })
 })
@@ -62,11 +62,19 @@ app.post('/inspection', (request, response) => {
         time,
         timeStamp: new Date()
     })
-    InspectionsObject.save()
-    response.json({
-        message: 'new Inspection saved Successfully',
-        data: InspectionsObject
-    })
+    try {
+        InspectionsObject.save()
+        response.json({
+            message: 'Your Inspection request saved Successfully',
+            data: InspectionsObject
+        })
+    } catch (error) {
+        console.log({error});
+        response.json({
+            message: 'Oops!, Something went wrong. Please try again...',
+            data: []
+        })
+    }
 })
 const port = process.env.SERVER_PORT
 app.listen(port, ()=> console.log(`Server listening to port ${port}`))
